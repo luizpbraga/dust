@@ -1,0 +1,83 @@
+// DataTypes 
+// comments 
+
+let x = 10
+let z = 10_000_000.90
+let y = "10"
+let txt = """
+    ola mundo $x $y
+    como vao as crianças 
+    nhac! 
+"""
+
+let x, y, z = 10, 13, 22
+
+let n = null
+
+let f = false 
+
+let t = tuple { 10, 20, 30 }
+
+let v = vec{ 1, 2, 3, 4, 5, 6}
+let l = { -1, ...[s for s in vec{1,2,3,4}], 0, 0, -9 }
+let l = { l..., ...l[::-1] }
+
+// void = ()
+
+let m = map { 
+    1 : 3, 
+    2 : 5, 
+    5 : 8,
+}
+
+// FUNCTION 
+const foo = fn(x, y) {
+    x+y
+}
+
+//or
+
+fn foo() {}
+
+// STRUCT
+const People = struct {
+    const v = 10
+
+    id,
+    name,
+    age,
+
+    showId = fn(){
+        this.id
+    }
+
+    printName = fn() {
+        @print this.name, v
+    }
+}
+
+// TRAIT/INTERFACE
+const Human = trait {
+    name,
+    fn showIn(),
+}
+
+// ENUM
+const Color = enum {
+    Red,
+    Blue,
+    Black,
+}
+
+// ERROR
+const err = error {
+    FileNotFound,
+    NotANumber,
+}
+
+for i in list { ... }
+for list { ... }
+for i in 0..=10 { ... }
+for i, _, k in v1, v2, v3 { ... }
+while i == 0 { ... } // infinit loop
+while i<10 :  (i++) { ... }
