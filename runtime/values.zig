@@ -1,3 +1,5 @@
+const std = @import("std");
+
 pub const ValueType = enum {
     Null,
     Number,
@@ -15,6 +17,14 @@ pub const RuntimeValue = union(enum) {
             .nullValue => |p| p.type,
             .boolValue => |p| p.type,
         };
+    }
+
+    pub fn printTorepl(self: @This()) void {
+        switch (self) {
+            .numberValue => |r| std.debug.print("=> {d} : {}\n", .{ r.value, r.type }),
+            .nullValue => |r| std.debug.print("=> {} : {}\n", .{ r.value, r.type }),
+            .boolValue => |r| std.debug.print("=> {} : {}\n", .{ r.value, r.type }),
+        }
     }
 };
 
@@ -38,7 +48,7 @@ pub fn mkNumber(n: f32) RuntimeValue {
 }
 
 pub fn mkBool(b: bool) RuntimeValue {
-    return .{ .bollValue = .{ .value = b } };
+    return .{ .boolValue = .{ .value = b } };
 }
 
 pub fn mkNull() RuntimeValue {

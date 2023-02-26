@@ -12,10 +12,13 @@ pub fn main() !void {
     var p = parser.Parser{};
     var scope = env.Environment{};
 
-    _ = try scope.declareVar("x", .{ .numberValue = .{ .value = 10 } });
-    _ = try scope.declareVar("true", .{ .boolValue = .{} });
-    _ = try scope.declareVar("false", .{ .boolValue = .{ .value = false } });
-    _ = try scope.declareVar("null", .{ .nullValue = .{} });
+    // GLOBAL VARIABLES
+    _ = try scope.declareVar("x", val.mkNumber(10), false);
+
+    // GLOBAL CONST
+    _ = try scope.declareVar("true", val.mkBool(true), true);
+    _ = try scope.declareVar("false", val.mkBool(false), true);
+    _ = try scope.declareVar("null", val.mkNull(), true);
 
     while (true) {
         var input: [100]u8 = undefined;
@@ -24,14 +27,16 @@ pub fn main() !void {
 
         var source: []const u8 = input[0..inpsize];
 
+        if (std.mem.eql(u8, source, "exit\n")) {
+            std.debug.print("> By By!", .{});
+            break;
+        }
+
         var program = try p.produceACT(source);
 
         const result = try inter.evaluate(.{ .program = program }, &scope);
 
-        switch (result) {
-            .numberValue => std.debug.print("=> {d}\n", .{result.numberValue.value}),
-            .nullValue => std.debug.print("=> {}\n", .{result.nullValue.value}),
-            .boolValue => std.debug.print("=> {}\n", .{result.boolValue.value}),
-        }
+        // print value and type
+        result.printTorepl();
     }
 }

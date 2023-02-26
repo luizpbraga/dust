@@ -26,6 +26,6 @@ pub fn evalVarDeclaration(
     else
         val.mkNull();
 
-    var res = try scope.declareVar(decl.identifier, run_val);
+    var res = try scope.declareVar(decl.identifier, run_val, decl.constant);
     return res;
 }
