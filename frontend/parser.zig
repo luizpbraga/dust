@@ -3,6 +3,8 @@ const ast = @import("ast.zig");
 const lexer = @import("lexer.zig");
 const inter = @import("../runtime/interpreter.zig");
 
+// *** TODO: Every Function Must Return an Expression
+
 const TokenError = error{
     MISSING_TOKEN,
 };
@@ -34,9 +36,38 @@ pub const Parser = struct {
         };
     }
 
+    // TODO: retorn ast.Expression
     fn parseExpr(this: *This) !ast.Statement {
-        // return try this.parsePrimaryExpr();
-        return try this.parseAdditiveExpr();
+        return try this.parseAssignmentExpr();
+    }
+
+    fn parseAssignmentExpr(this: *This) !ast.Statement {
+        var left = try lexer.ga.create(ast.Statement);
+        left.* = try this.parseAdditiveExpr(); // will be parseObjExpr();
+        //
+        if (this.at().type == .Equals) {
+            _ = this.eat();
+            var value = try lexer.ga.create(ast.Statement);
+            value.* = try this.parseAssignmentExpr();
+
+            // copys
+            var lcp = try lexer.ga.create(ast.Statement);
+            lcp.* = left.*;
+
+            var vcp = try lexer.ga.create(ast.Statement);
+            vcp.* = value.*;
+
+            return .{
+                .expression = .{
+                    .assignmentExpr = .{
+                        .value = &vcp.expression,
+                        .assigne = &lcp.expression,
+                    },
+                },
+            };
+        }
+
+        return left.*;
     }
 
     // LET NAME;
@@ -212,7 +243,7 @@ pub const Parser = struct {
     }
 };
 
-// beautiful print
+// beautiful recursive print
 pub fn repel(exp: ?*ast.Expression) void {
     if (exp) |e| switch (e.*) {
         .identifier => |p| std.debug.print("> {} {s}\n", .{ p.kind, p.symbol }),
