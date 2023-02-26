@@ -34,3 +34,13 @@ pub fn evalIdentifier(ident: ast.Identifier, scope: *env.Environment) anyerror!v
     var run_val = try scope.lookUp(ident.symbol);
     return run_val;
 }
+
+pub fn evalAssignment(assExp: ast.AssignmentExpr, scope: *env.Environment) anyerror!val.RuntimeValue {
+    if (assExp.assigne.?.kind() != .Identifier)
+        return error.InvalidLHS;
+
+    var var_name = assExp.assigne.?.identifier.symbol;
+    var var_value = try inter.evaluate(.{ .expression = assExp.value.?.* }, scope);
+
+    return try scope.assigneVar(var_name, var_value);
+}
