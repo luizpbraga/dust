@@ -8,12 +8,13 @@ const val = @import("runtime/values.zig");
 
 pub fn main() !void {
     std.debug.print("REPL: Dust v0.1\n", .{});
+    std.debug.print("---------------\n", .{});
 
     var p = parser.Parser{};
     var scope = env.Environment{};
 
-    // GLOBAL VARIABLES
-    _ = try scope.declareVar("x", val.mkNumber(10), false);
+    // // GLOBAL VARIABLES
+    // _ = try scope.declareVar("x", val.mkNumber(10), false);
 
     // GLOBAL CONST
     _ = try scope.declareVar("true", val.mkBool(true), true);
@@ -28,7 +29,7 @@ pub fn main() !void {
         var source: []const u8 = input[0..inpsize];
 
         if (std.mem.eql(u8, source, "exit\n")) {
-            std.debug.print("> By By!", .{});
+            std.debug.print("> Salamaleico MF!\n", .{});
             break;
         }
 
