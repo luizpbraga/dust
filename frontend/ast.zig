@@ -8,10 +8,13 @@ pub const NodeType = enum {
     Program,
     VarDeclaration,
     // Expressions
+    AssignmentExpr,
+    BinaryExpr,
+    // Literals
+    Property,
+    StructLiteral,
     NumericLiteral,
     Identifier,
-    BinaryExpr,
-    AssignmentExpr,
 };
 
 pub const Statement = union(enum) {
@@ -31,6 +34,8 @@ pub const Statement = union(enum) {
                 .assignmentExpr => .AssignmentExpr,
                 .identifier => .Identifier,
                 .numericLiteral => .NumericLiteral,
+                .property => .Property,
+                .structLiteral => .StructLiteral,
             },
         };
     }
@@ -52,6 +57,8 @@ pub const Expression = union(enum) {
     identifier: Identifier,
     numericLiteral: NumericLiteral,
     assignmentExpr: AssignmentExpr,
+    property: Property,
+    structLiteral: StructLiteral,
 
     pub fn kind(self: @This()) NodeType {
         return switch (self) {
@@ -59,6 +66,8 @@ pub const Expression = union(enum) {
             .assignmentExpr => .AssignmentExpr,
             .identifier => .Identifier,
             .numericLiteral => .NumericLiteral,
+            .property => .Property,
+            .structLiteral => .StructLiteral,
         };
     }
 };
@@ -86,6 +95,17 @@ pub const Identifier = struct {
 pub const NumericLiteral = struct {
     kind: NodeType = .NumericLiteral,
     value: f32,
+};
+
+pub const Property = struct {
+    kind: NodeType = .Property,
+    key: []const u8,
+    value: ?*Expression = null,
+};
+
+pub const StructLiteral = struct {
+    kind: NodeType = .StructLiteral,
+    properties: []Property,
 };
 
 // pub const NullLiteral = struct {

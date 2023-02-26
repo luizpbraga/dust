@@ -44,7 +44,6 @@ fn foo() {}
 // STRUCT
 const People = struct {
     const v = 10
-
     id,
     name,
     age,

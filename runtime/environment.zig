@@ -7,14 +7,42 @@ const ga = @import("../frontend/lexer.zig").ga;
 pub const MapNameVal = std.StringHashMap(val.RuntimeValue);
 pub const SetNameConst = std.StringHashMap(void);
 
+pub fn setupScope(scope: *Environment) !void {
+    // GLOBAL CONST
+    _ = try scope.declareVar("true", val.mkBool(true), true);
+    _ = try scope.declareVar("false", val.mkBool(false), true);
+    _ = try scope.declareVar("null", val.mkNull(), true);
+}
+
 pub const Environment = struct {
+    const This = @This();
+
     /// scope
     parent: ?*Environment = null,
 
     /// map (name, value)
-    variables: MapNameVal = MapNameVal.init(ga),
+    variables: MapNameVal, //= MapNameVal.init(ga),
     /// map (name, void)
-    constants: SetNameConst = SetNameConst.init(ga),
+    constants: SetNameConst, // = SetNameConst.init(ga),
+
+    pub fn init(
+        scope_config: struct { parent_scope: ?*Environment = null },
+    ) anyerror!Environment {
+        const global = if (scope_config.parent_scope == null) true else false;
+
+        var env_result = try ga.create(Environment);
+
+        env_result = &.{
+            .parent = scope_config.parent_scope,
+            .variables = MapNameVal.init(ga),
+            .constants = SetNameConst.init(ga),
+        };
+
+        if (global)
+            try setupScope(env_result);
+
+        return env_result.*;
+    }
 
     pub fn declareVar(
         this: *@This(),

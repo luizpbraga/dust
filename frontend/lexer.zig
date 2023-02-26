@@ -5,10 +5,15 @@ pub const TokenType = enum {
     Number,
     Identifier,
     BinaryOperator,
+    LeftBrace, // {
+    RightBrace, // }
     LeftParenthesis,
     RightParenthesis,
-    Equals,
-    SemiColon,
+    Equals, // =
+    Colon, // :
+    Comma, // ,
+    SemiColon, // ;
+    Dot, // .
     EOF,
 
     // private keys
@@ -93,15 +98,17 @@ pub fn tokenizer(file: []const u8) !struct {
             // special tokens
             '(' => try token_list.append(Token{ .value = str, .type = .LeftParenthesis }),
             ')' => try token_list.append(Token{ .value = str, .type = .RightParenthesis }),
-            // '{' => try token_list.append(Token{ .value = &.{token}, .type = .LeftBracket }),
-            // '}' => try token_list.append(Token{ .value = &.{token}, .type = .RightBracket }),
+            '{' => try token_list.append(Token{ .value = str, .type = .LeftBrace }),
+            '}' => try token_list.append(Token{ .value = str, .type = .RightBrace }),
             '+', '-', '*', '/', '%' => try token_list.append(Token{ .value = str, .type = .BinaryOperator }),
             '=' => try token_list.append(Token{ .value = str, .type = .Equals }),
-            ';' => try token_list.append(Token{ .value = &.{token}, .type = .SemiColon }),
+            ';' => try token_list.append(Token{ .value = str, .type = .SemiColon }),
+            ':' => try token_list.append(Token{ .value = str, .type = .Colon }),
+            ',' => try token_list.append(Token{ .value = str, .type = .Comma }),
+            '.' => try token_list.append(Token{ .value = str, .type = .Dot }),
             // '"' => try token_list.append(Token{ .value = &.{token}, .type = .DoubleQuote }),
             // '\'' => try token_list.append(Token{ .value = &.{token}, .type = .SingleQuote }),
-            // ',' => try token_list.append(Token{ .value = &.{token}, .type = .Colon }),
-            '\n', '\t', ' ' => continue,
+            '\n', '\r', '\t', ' ' => continue,
 
             else => {
                 // number

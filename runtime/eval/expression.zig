@@ -44,3 +44,20 @@ pub fn evalAssignment(assExp: ast.AssignmentExpr, scope: *env.Environment) anyer
 
     return try scope.assigneVar(var_name, var_value);
 }
+
+pub fn evalStructExpr(struct_literal: ast.StructLiteral, scope: *env.Environment) anyerror!val.RuntimeValue {
+    var final_struct = val.StructValue{};
+
+    // hendle not null keys
+
+    for (struct_literal.properties) |prop| {
+        var key = prop.key;
+        var value = prop.value;
+
+        var runtime_value = if (value) |x| try inter.evaluate(.{ .expression = x.* }, scope) else try scope.lookUp(key);
+
+        try final_struct.properties.put(key, runtime_value);
+    }
+
+    return .{ .structValue = final_struct };
+}
