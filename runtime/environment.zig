@@ -45,7 +45,7 @@ pub const Environment = struct {
             return error.CANNOTASSIGNETOCONST;
         }
 
-        env.variables.put(var_name, var_name);
+        try env.variables.put(var_name, value);
 
         return value;
     }
