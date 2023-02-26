@@ -1,6 +1,5 @@
 // -----------------------------------------------------------
 // --------------          AST TYPES        ------------------
-// ---     Defines the structure of our languages AST      ---
 // -----------------------------------------------------------
 //
 //
@@ -12,15 +11,15 @@ pub const NodeType = enum {
     NumericLiteral,
     Identifier,
     BinaryExpr,
-    // NullLiteral,
+    AssignmentExpr,
 };
 
 pub const Statement = union(enum) {
-    // a program contains Stmt
+    // a program contains Statement
     program: Program,
     // An expression return a value
     expression: Expression,
-    //
+    // Guess What?
     varDeclaration: VarDeclaration,
 
     pub fn kind(self: @This()) NodeType {
@@ -29,9 +28,9 @@ pub const Statement = union(enum) {
             .varDeclaration => .VarDeclaration,
             .expression => |ex| switch (ex) {
                 .binaryExpr => .BinaryExpr,
+                .assignmentExpr => .AssignmentExpr,
                 .identifier => .Identifier,
                 .numericLiteral => .NumericLiteral,
-                // .nullLiteral => .NullLiteral,
             },
         };
     }
@@ -52,7 +51,24 @@ pub const Expression = union(enum) {
     binaryExpr: BinaryExpr,
     identifier: Identifier,
     numericLiteral: NumericLiteral,
-    // nullLiteral: NullLiteral,
+    assignmentExpr: AssignmentExpr,
+
+    pub fn kind(self: @This()) NodeType {
+        return switch (self) {
+            .binaryExpr => .BinaryExpr,
+            .assignmentExpr => .AssignmentExpr,
+            .identifier => .Identifier,
+            .numericLiteral => .NumericLiteral,
+        };
+    }
+};
+
+pub const AssignmentExpr = struct {
+    kind: NodeType = .AssignmentExpr,
+    // let x = { ... };
+    // x.foo = {...}
+    assigne: ?*Expression = null, // string
+    value: ?*Expression = null,
 };
 
 pub const BinaryExpr = struct {
