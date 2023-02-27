@@ -16,41 +16,38 @@ pub const RuntimeValue = union(enum) {
 
     pub fn haveType(self: @This()) ValueType {
         return switch (self) {
-            .nullValue => |p| p.type,
-            .boolValue => |p| p.type,
-            .numberValue => |p| p.type,
-            .structValue => |p| p.type,
+            inline else => |p| p.type,
         };
     }
 
+    // TODO: recursive print
     pub fn printTorepl(self: @This()) void {
         switch (self) {
+            inline else => |r| std.debug.print("=> {} : {}\n", .{ r.value, r.type }),
             .numberValue => |r| std.debug.print("=> {d} : {}\n", .{ r.value, r.type }),
-            .nullValue => |r| std.debug.print("=> {} : {}\n", .{ r.value, r.type }),
-            .boolValue => |r| std.debug.print("=> {} : {}\n", .{ r.value, r.type }),
             .structValue => |r| {
                 for (r.properties.keys()) |name| {
-                    std.debug.print("=> {{ key: {s}, ", .{name});
+                    std.debug.print("{{ name: {s}, ", .{name});
                     var _value = r.properties.get(name);
                     if (_value) |value|
                         switch (value) {
                             .numberValue => |p| {
                                 std.debug.print("value : {d} }}\n", .{p.value});
                             },
-                            .nullValue => |p| {
-                                std.debug.print("value : {} }}\n", .{p.value});
-                            },
+
                             .structValue => |p| {
-                                std.debug.print("value : {} }}\n", .{p.properties});
+                                std.debug.print("field : \n", .{});
+                                printTorepl(.{ .structValue = p });
+                                std.debug.print("}}\n", .{});
                             },
 
-                            .boolValue => |p| {
+                            inline else => |p| {
                                 std.debug.print("value : {} }}\n", .{p.value});
                             },
                         };
                 }
 
-                std.debug.print("\t : {}\n", .{r.type});
+                // std.debug.print("   : {}\n", .{r.type});
             },
         }
     }

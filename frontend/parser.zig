@@ -37,51 +37,32 @@ pub const Parser = struct {
         };
     }
 
-    // TODO: retorn ast.Expression
-    //fn parseExpr(this: *This) !ast.Statement {
     fn parseExpr(this: *This) !ast.Expression {
         return try this.parseAssignmentExpr();
     }
 
-    // fn parseAssignmentExpr(this: *This) !ast.Statement {
     fn parseAssignmentExpr(this: *This) !ast.Expression {
-        // var left = try lexer.ga.create(ast.Statement);
         var left = try lexer.ga.create(ast.Expression);
-        // left.* = try this.parseAdditiveExpr(); // will be parseObjExpr();
         left.* = try this.parseStructExpr();
         //
         if (this.at().type == .Equals) {
             _ = this.eat();
-            // var value = try lexer.ga.create(ast.Statement);
             var value = try lexer.ga.create(ast.Expression);
             value.* = try this.parseAssignmentExpr();
 
             // copys
-            // var lcp = try lexer.ga.create(ast.Statement);
             var lcp = try lexer.ga.create(ast.Expression);
             lcp.* = left.*;
 
-            // var vcp = try lexer.ga.create(ast.Statement);
             var vcp = try lexer.ga.create(ast.Expression);
             vcp.* = value.*;
 
             return .{
                 .assignmentExpr = .{
-                    // .value = &vcp.expression,
-                    // .assigne = &lcp.expression,
                     .value = vcp,
                     .assigne = lcp,
                 },
             };
-
-            // return .{
-            //     .expression = .{
-            //         .assignmentExpr = .{
-            //             .value = &vcp.expression,
-            //             .assigne = &lcp.expression,
-            //         },
-            //     },
-            // };
         }
 
         return left.*;
@@ -95,9 +76,6 @@ pub const Parser = struct {
         _ = this.eat();
 
         _ = try this.expect(.LeftBrace);
-
-        // if (this.eat().type != .LeftBrace)
-        //     return try this.parseAdditiveExpr();
 
         // array of Propeties
         var prop_list = std.ArrayList(ast.Property).init(lexer.ga);
@@ -165,7 +143,6 @@ pub const Parser = struct {
 
         _ = try this.expect(.Equals);
 
-        // const stmt = try this.parseExpr();
         const exp = try this.parseExpr();
         const declaration = ast.VarDeclaration{
             // .value = stmt.expression,
@@ -179,10 +156,7 @@ pub const Parser = struct {
         return .{ .varDeclaration = declaration };
     }
 
-    // fn parseAdditiveExpr(this: *This) !ast.Statement {
     fn parseAdditiveExpr(this: *This) !ast.Expression {
-        // var right = try lexer.ga.create(ast.Statement);
-        // var left = try lexer.ga.create(ast.Statement);
         var right = try lexer.ga.create(ast.Expression);
         var left = try lexer.ga.create(ast.Expression);
 
@@ -197,42 +171,24 @@ pub const Parser = struct {
 
             right.* = try this.parseMultiplicativeExpr();
 
-            // var lcp = try lexer.ga.create(ast.Statement);
             var lcp = try lexer.ga.create(ast.Expression);
-            lcp.* = left.*;
-            // var rcp = try lexer.ga.create(ast.Statement);
             var rcp = try lexer.ga.create(ast.Expression);
             rcp.* = right.*;
+            lcp.* = left.*;
 
             left.* = .{
                 .binaryExpr = .{
                     .operator = op,
-                    // .left = &lcp.expression,
-                    // .right = &rcp.expression,
                     .left = lcp,
                     .right = rcp,
                 },
             };
-
-            // left.* = .{
-            //     .expression = .{
-            //         .binaryExpr = .{
-            //             .operator = op,
-            //             .left = &lcp.expression,
-            //             .right = &rcp.expression,
-            //         },
-            //     },
-            // };
         }
 
-        // return result.*;
         return left.*;
     }
 
-    // fn parseMultiplicativeExpr(this: *This) !ast.Statement {
     fn parseMultiplicativeExpr(this: *This) !ast.Expression {
-        // var right = try lexer.ga.create(ast.Statement);
-        // var left = try lexer.ga.create(ast.Statement);
         var right = try lexer.ga.create(ast.Expression);
         var left = try lexer.ga.create(ast.Expression);
 
@@ -240,7 +196,6 @@ pub const Parser = struct {
 
         left.* = try this.parsePrimaryExpr(); //
 
-        // parsing the operator
         while (std.mem.eql(u8, this.at().value, "*") or
             std.mem.eql(u8, this.at().value, "/") or
             std.mem.eql(u8, this.at().value, "%"))
@@ -249,13 +204,9 @@ pub const Parser = struct {
 
             right.* = try this.parsePrimaryExpr();
 
-            // var lcp = try lexer.ga.create(ast.Statement);
-            // lcp.* = left.*;
-            // var rcp = try lexer.ga.create(ast.Statement);
-            // rcp.* = right.*;
             var lcp = try lexer.ga.create(ast.Expression);
-            lcp.* = left.*;
             var rcp = try lexer.ga.create(ast.Expression);
+            lcp.* = left.*;
             rcp.* = right.*;
 
             left.* = .{
@@ -263,38 +214,37 @@ pub const Parser = struct {
                     .operator = op,
                     .left = lcp,
                     .right = rcp,
-                    // .left = &lcp.expression,
-                    // .right = &rcp.expression,
                 },
             };
-
-            // left.* = .{
-            //     .expression = .{
-            //         .binaryExpr = .{
-            //             .operator = op,
-            //             .left = &lcp.expression,
-            //             .right = &rcp.expression,
-            //         },
-            //     },
-            // };
         }
 
-        // return result.*;
         return left.*;
     }
 
-    // fn parsePrimaryExpr(self: *This) anyerror!ast.Statement {
+    fn parseCallMemberExpr(self: *This) anyerror!ast.Expression {
+        return self;
+    }
+
+    fn parseCallExpr(self: *This) anyerror!ast.Expression {
+        return self;
+    }
+
+    fn parseArgsExpr(self: *This) anyerror![]ast.Expression {
+        return self;
+    }
+
+    fn parseArgsList(self: *This) anyerror![]ast.Expression {
+        return self;
+    }
+
+    fn parseMemberExpr(self: *This) anyerror![]ast.Expression {
+        return self;
+    }
+
     fn parsePrimaryExpr(self: *This) anyerror!ast.Expression {
         var tk = self.at().type;
 
-        // lest find the statements
         return switch (tk) {
-            // .Identifier => .{ .expression = .{ .identifier = .{
-            //     .symbol = self.eat().value,
-            // } } },
-            // .Number => .{ .expression = .{ .numericLiteral = .{
-            //     .value = try std.fmt.parseFloat(f32, self.eat().value),
-            // } } },
             .Identifier => .{
                 .identifier = .{
                     .symbol = self.eat().value,
@@ -380,23 +330,23 @@ pub fn repel(exp: ?*ast.Expression) void {
     };
 }
 
-// pub fn main() !void {
-//     var source = "10 - 10 + 10";
+test "main" {
+    var source = "10 - 10 + 10";
 
-//     var parser = Parser{};
-//     var program = try parser.produceACT(source);
+    var parser = Parser{};
+    var program = try parser.produceACT(source);
 
-//     std.debug.print("{}\n", .{program.kind});
+    std.debug.print("{}\n", .{program.kind});
 
-//     for (program.body.?) |*body| {
-//         std.debug.print("{}\n", .{body.kind()});
+    for (program.body.?) |*body| {
+        std.debug.print("{}\n", .{body.kind()});
 
-//         repel(&body.expression);
+        repel(&body.expression);
 
-//         std.debug.print("{}", .{body.expression});
-//         // }
-//     }
+        std.debug.print("{}", .{body.expression});
+        // }
+    }
 
-//     const result = try inter.evaluate(.{ .program = program });
-//     std.debug.print("\n=> {}", .{result});
-// }
+    const result = try inter.evaluate(.{ .program = program });
+    std.debug.print("\n=> {}", .{result});
+}

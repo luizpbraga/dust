@@ -10,6 +10,8 @@ pub const NodeType = enum {
     // Expressions
     AssignmentExpr,
     BinaryExpr,
+    CallExpr,
+    MemberExpr,
     // Literals
     Property,
     StructLiteral,
@@ -25,21 +27,18 @@ pub const Statement = union(enum) {
     // Guess What?
     varDeclaration: VarDeclaration,
 
+    /// The Statement kind. Thanks to whoever implemented the
+    /// inline switch
     pub fn kind(self: @This()) NodeType {
         return switch (self) {
-            .program => .Program,
-            .varDeclaration => .VarDeclaration,
             .expression => |ex| switch (ex) {
-                .binaryExpr => .BinaryExpr,
-                .assignmentExpr => .AssignmentExpr,
-                .identifier => .Identifier,
-                .numericLiteral => .NumericLiteral,
-                .property => .Property,
-                .structLiteral => .StructLiteral,
+                inline else => |p| p.kind,
             },
+            inline else => |p| p.kind,
         };
     }
 };
+
 pub const VarDeclaration = struct {
     kind: NodeType = .VarDeclaration,
     constant: bool = false,
@@ -59,15 +58,12 @@ pub const Expression = union(enum) {
     assignmentExpr: AssignmentExpr,
     property: Property,
     structLiteral: StructLiteral,
+    callExpr: CallExpr,
+    memberExpr: MemberExpr,
 
     pub fn kind(self: @This()) NodeType {
         return switch (self) {
-            .binaryExpr => .BinaryExpr,
-            .assignmentExpr => .AssignmentExpr,
-            .identifier => .Identifier,
-            .numericLiteral => .NumericLiteral,
-            .property => .Property,
-            .structLiteral => .StructLiteral,
+            inline else => |p| p.kind,
         };
     }
 };
@@ -85,6 +81,21 @@ pub const BinaryExpr = struct {
     left: ?*Expression = null,
     right: ?*Expression = null,
     operator: []const u8,
+};
+
+// foo['bar']()
+pub const MemberExpr = struct {
+    kind: NodeType = .MemberExpr,
+    object: ?*Expression = null,
+    property: ?*Expression = null,
+    computed: bool = false,
+};
+
+// foo.bar().foo
+pub const CallExpr = struct {
+    kind: NodeType = .CallExpr,
+    args: []Expression,
+    caller: ?*Expression = null,
 };
 
 pub const Identifier = struct {

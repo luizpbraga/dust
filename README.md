@@ -26,17 +26,22 @@ To execute using a file
   * Struct declaration;
 
 - TODO:
-  * Function/enum/struct/error/trait declaration etc;
+  * Strings, Floats
+  * Function/enum/struct/error/trait declaration;
+  * if/else/while/for
+  * Build System
 
 
 ### Code Example
+
+At this moment, we have null, bool, number and struct kinds;
 
 ```Rust
 let a = 666;
 
 const Foo = struct {
   .a,
-  .x = 10,
+  .x = 10 * 100 - 10 / 2,
   .b = 100,
   .c = struct{
     .d = null,

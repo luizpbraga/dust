@@ -1,5 +1,5 @@
 const obj = struct {
-    .a = 10,
+    .a = 10.5 * 77.33,
     .b = 100,
     .complex = struct {
         .foo = null,

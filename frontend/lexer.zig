@@ -5,6 +5,8 @@ pub const TokenType = enum {
     Number,
     Identifier,
     BinaryOperator,
+    LeftBracket, // [
+    RightBracket, // ]
     LeftBrace, // {
     RightBrace, // }
     LeftParenthesis,
@@ -24,14 +26,21 @@ pub const TokenType = enum {
     Struct,
     Error,
     Return,
-    Mut,
 };
 
 pub fn keyWord(string: []const u8) TokenType {
     return if (std.mem.eql(u8, string, "fn"))
         .Fn
-    else if (std.mem.eql(u8, string, "mut"))
-        .Mut
+        // else if (std.mem.eql(u8, string, "while"))
+        //     .While
+        // else if (std.mem.eql(u8, string, "if"))
+        //     .If
+        // else if (std.mem.eql(u8, string, "else"))
+        //     .Else
+        // else if (std.mem.eql(u8, string, "else if"))
+        //     .ElseIf
+        // else if (std.mem.eql(u8, string, "for"))
+        //     .For
     else if (std.mem.eql(u8, string, "return"))
         .Return
     else if (std.mem.eql(u8, string, "enum"))
@@ -56,14 +65,14 @@ pub const Token = struct {
 
     fn isNumber(char: u8) bool {
         return switch (char) {
-            '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' => true,
+            '.', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' => true,
             else => false,
         };
     }
 
     fn isString(char: u8) bool {
         return switch (char) {
-            '_', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z' => true,
+            '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '_', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z' => true,
             else => false,
         };
     }
@@ -98,6 +107,8 @@ pub fn tokenizer(file: []const u8) !struct {
             // special tokens
             '(' => try token_list.append(Token{ .value = str, .type = .LeftParenthesis }),
             ')' => try token_list.append(Token{ .value = str, .type = .RightParenthesis }),
+            '[' => try token_list.append(Token{ .value = str, .type = .LeftBracket }),
+            ']' => try token_list.append(Token{ .value = str, .type = .RightBracket }),
             '{' => try token_list.append(Token{ .value = str, .type = .LeftBrace }),
             '}' => try token_list.append(Token{ .value = str, .type = .RightBrace }),
             '+', '-', '*', '/', '%' => try token_list.append(Token{ .value = str, .type = .BinaryOperator }),
@@ -150,7 +161,7 @@ pub fn tokenizer(file: []const u8) !struct {
                     try trash.append(string);
                 } else {
                     std.log.err("Unknown Character: '{c}'\n", .{token});
-                    @panic("TOKEN: Aborting doe the previously error");
+                    @panic("TOKEN: Aborting doe the previous error");
                 }
             },
         }
