@@ -194,7 +194,8 @@ pub const Parser = struct {
 
         // ble: var result = try lexer.ga.create(ast.Statement);
 
-        left.* = try this.parsePrimaryExpr(); //
+        // left.* = try this.parsePrimaryExpr(); //
+        left.* = try this.parseCallMemberExpr(); //
 
         while (std.mem.eql(u8, this.at().value, "*") or
             std.mem.eql(u8, this.at().value, "/") or
@@ -202,7 +203,7 @@ pub const Parser = struct {
         {
             const op = this.eat().value;
 
-            right.* = try this.parsePrimaryExpr();
+            right.* = try this.parseCallMemberExpr();
 
             var lcp = try lexer.ga.create(ast.Expression);
             var rcp = try lexer.ga.create(ast.Expression);
@@ -221,23 +222,60 @@ pub const Parser = struct {
         return left.*;
     }
 
+    // foo.x ()
     fn parseCallMemberExpr(self: *This) anyerror!ast.Expression {
-        return self;
+        var member = try self.parseMemberExpr(); // foo.x
+
+        if (self.at().type == .LeftParenthesis)
+            return self.parseCallExpr(member); // ()
+
+        return member;
     }
 
-    fn parseCallExpr(self: *This) anyerror!ast.Expression {
-        return self;
+    fn parseCallExpr(self: *This, caller: ast.Expression) anyerror!ast.Expression {
+        var call_expr = ast.Expression{
+            .callExpr = .{
+                .caller = caller,
+                .args = try self.parseArgsList(),
+            },
+        };
+
+        // foo.x()()()
+        if (self.at().type == .LeftParenthesis)
+            call_expr = try self.parseCallExpr(call_expr);
+
+        return call_expr;
     }
 
+    /// print(x, y, x) => x and y are parameters
     fn parseArgsExpr(self: *This) anyerror![]ast.Expression {
-        return self;
+        _ = try self.expect(.LeftParenthesis);
+
+        var args = if (self.at().type == .RightParenthesis)
+            try lexer.ga.alloc(ast.Expression)
+        else
+            try self.parseArgsList();
+
+        _ = try self.expect(.RightParenthesis);
+
+        return args;
     }
 
     fn parseArgsList(self: *This) anyerror![]ast.Expression {
+        var args = std.ArrayList(ast.Expression).init(lexer.ga);
+
+        try args.append(try self.parseAssignmentExpr());
+
+        while (self.at().type == .Comma) {
+            _ = self.eat();
+
+            try args.append(try self.parseAssignmentExpr());
+        }
+
         return self;
     }
 
-    fn parseMemberExpr(self: *This) anyerror![]ast.Expression {
+    fn parseMemberExpr(self: *This) anyerror!ast.Expression {
         return self;
     }
 
